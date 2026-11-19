@@ -51,3 +51,11 @@ export function cambiarEstadoSerie(id, estado) {
 export function eliminarSerie(id) {
   return pedir(`/series/${id}`, 'DELETE')
 }
+export async function obtenerSerie(id) {
+  const series = await obtenerSeries()
+  const serie = series.find((s) => s._id === id)
+  if (!serie) {
+    throw new Error('No se encontró la serie')
+  }
+  return serie
+}

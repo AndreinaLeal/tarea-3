@@ -1,7 +1,8 @@
 // TarjetaSerie.jsx
-// Una tarjeta por serie: muestra sus datos y los botones para avanzar el estado o quitarla.
+// Una tarjeta por serie: muestra sus datos y los botones para avanzar el estado, ver el detalle o quitarla.
 // No sabe nada del API: avisa hacia arriba con onAvanzar y onQuitar.
 
+import { Link } from 'react-router'
 import { claseEstado, siguienteEstado } from '../../utils/series.js'
 
 function TarjetaSerie({ serie, onAvanzar, onQuitar }) {
@@ -14,7 +15,7 @@ function TarjetaSerie({ serie, onAvanzar, onQuitar }) {
             <span className={'badge ' + claseEstado(serie.estado)}>{serie.estado}</span>
           </div>
           <p className="card-text text-secondary mb-3">Miembro: {serie.miembro}</p>
-          <div className="mt-auto d-flex gap-2">
+          <div className="mt-auto d-flex flex-wrap gap-2">
             <button
               type="button"
               className="btn btn-sm btn-outline-primary"
@@ -22,6 +23,9 @@ function TarjetaSerie({ serie, onAvanzar, onQuitar }) {
             >
               Pasar a {siguienteEstado(serie.estado)}
             </button>
+            <Link className="btn btn-sm btn-outline-secondary" to={`/series/${serie._id}`}>
+              Ver detalle
+            </Link>
             <button
               type="button"
               className="btn btn-sm btn-outline-danger"

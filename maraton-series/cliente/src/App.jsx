@@ -6,6 +6,7 @@ import { Routes, Route } from 'react-router'
 import Layout from './componentes/layout/Layout.jsx'
 import Inicio from './paginas/Inicio.jsx'
 import PaginaSeries from './paginas/PaginaSeries.jsx'
+import PaginaNuevaSerie from './paginas/PaginaNuevaSerie.jsx'
 import PaginaDetalleSerie from './paginas/PaginaDetalleSerie.jsx'
 import NoEncontrada from './paginas/NoEncontrada.jsx'
 
@@ -15,6 +16,7 @@ function App() {
       <Route element={<Layout />}>
         <Route index element={<Inicio />} />
         <Route path="series" element={<PaginaSeries />} />
+        <Route path="series/nueva" element={<PaginaNuevaSerie />} />
         <Route path="series/:id" element={<PaginaDetalleSerie />} />
         <Route path="*" element={<NoEncontrada />} />
       </Route>

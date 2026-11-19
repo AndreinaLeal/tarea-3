@@ -34,5 +34,7 @@ public class MaratonDbContext(DbContextOptions<MaratonDbContext> opciones) : DbC
              .HasForeignKey(x => x.MiembroId)
              .OnDelete(DeleteBehavior.Restrict);
         });
+
+        DatosIniciales.Sembrar(modelBuilder);
     }
 }

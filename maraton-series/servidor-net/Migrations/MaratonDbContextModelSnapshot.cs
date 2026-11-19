@@ -49,6 +49,36 @@ namespace ServidorNet.Migrations
                         .IsUnique();
 
                     b.ToTable("Miembros");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Correo = "ana@correo.com",
+                            Nombre = "Ana",
+                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Correo = "luis@correo.com",
+                            Nombre = "Luis",
+                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Correo = "maria@correo.com",
+                            Nombre = "María",
+                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Correo = "carlos@correo.com",
+                            Nombre = "Carlos",
+                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("ServidorNet.Modelos.Serie", b =>
@@ -89,6 +119,80 @@ namespace ServidorNet.Migrations
                             t.HasCheckConstraint("CK_Series_Estado", "[Estado] IN ('Por ver', 'Viendo', 'Vista')");
 
                             t.HasCheckConstraint("CK_Series_Temporadas", "[Temporadas] > 0");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Estado = "Vista",
+                            Genero = "Drama",
+                            MiembroId = 1,
+                            Temporadas = 5,
+                            Titulo = "Breaking Bad"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Estado = "Viendo",
+                            Genero = "Comedia",
+                            MiembroId = 2,
+                            Temporadas = 9,
+                            Titulo = "The Office"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Estado = "Por ver",
+                            Genero = "Ciencia ficción",
+                            MiembroId = 3,
+                            Temporadas = 3,
+                            Titulo = "Dark"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Estado = "Viendo",
+                            Genero = "Ciencia ficción",
+                            MiembroId = 4,
+                            Temporadas = 4,
+                            Titulo = "Stranger Things"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Estado = "Vista",
+                            Genero = "Drama",
+                            MiembroId = 1,
+                            Temporadas = 1,
+                            Titulo = "Chernobyl"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Estado = "Por ver",
+                            Genero = "Documental",
+                            MiembroId = 2,
+                            Temporadas = 2,
+                            Titulo = "Planeta Tierra"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Estado = "Por ver",
+                            Genero = "Comedia",
+                            MiembroId = 3,
+                            Temporadas = 2,
+                            Titulo = "Wednesday"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Estado = "Viendo",
+                            Genero = "Drama",
+                            MiembroId = 4,
+                            Temporadas = 2,
+                            Titulo = "The Last of Us"
                         });
                 });
 

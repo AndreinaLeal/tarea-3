@@ -1,0 +1,17 @@
+# Peticiones de prueba para la extensión REST Client de VS Code.
+# Con el servidor en marcha: dotnet run --launch-profile http
+
+@net = http://localhost:5256
+@express = http://localhost:3000
+
+### 1. Series desde .NET  ->  200, arreglo ordenado por titulo
+GET {{net}}/api/series
+
+### 2. Miembros desde .NET  ->  200, con generosFavoritos como arreglo de textos
+GET {{net}}/api/miembros
+
+### 3. Comparacion: las mismas series desde Express (los _id difieren, el resto del JSON debe coincidir)
+GET {{express}}/api/series
+
+### 4. Comparacion: los mismos miembros desde Express
+GET {{express}}/api/miembros

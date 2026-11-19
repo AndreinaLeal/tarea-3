@@ -9,4 +9,7 @@ public class Miembro
 
     // Un miembro propone muchas series (relación 1 a muchos)
     public List<Serie> Series { get; set; } = [];
+
+    // Un miembro tiene varios géneros favoritos (relación 1 a muchos)
+    public List<GeneroFavorito> GenerosFavoritos { get; set; } = [];
 }

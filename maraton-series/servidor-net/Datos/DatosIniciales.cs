@@ -3,19 +3,30 @@ using ServidorNet.Modelos;
 
 namespace ServidorNet.Datos;
 
-// Datos de siembra: los mismos 4 miembros y 8 series del seed.js de Express.
+// Datos de siembra: los mismos miembros, géneros favoritos y series del seed.js de Express.
 // HasData necesita ids fijos y fechas fijas, para que la migracion sea siempre la misma.
 public static class DatosIniciales
 {
     public static void Sembrar(ModelBuilder modelBuilder)
     {
-        var fecha = new DateTime(2026, 1, 1);
+        var registro = new DateTime(2026, 11, 11, 1, 30, 48, 692);
 
         modelBuilder.Entity<Miembro>().HasData(
-            new Miembro { Id = 1, Nombre = "Ana",    Correo = "ana@correo.com",    Registro = fecha },
-            new Miembro { Id = 2, Nombre = "Luis",   Correo = "luis@correo.com",   Registro = fecha },
-            new Miembro { Id = 3, Nombre = "María",  Correo = "maria@correo.com",  Registro = fecha },
-            new Miembro { Id = 4, Nombre = "Carlos", Correo = "carlos@correo.com", Registro = fecha }
+            new Miembro { Id = 1, Nombre = "Ana",    Correo = "ana@correo.com",    Registro = registro },
+            new Miembro { Id = 2, Nombre = "Luis",   Correo = "luis@correo.com",   Registro = registro },
+            new Miembro { Id = 3, Nombre = "María",  Correo = "maria@correo.com",  Registro = registro },
+            new Miembro { Id = 4, Nombre = "Carlos", Correo = "carlos@correo.com", Registro = registro }
+        );
+
+        // El Id conserva el orden del arreglo original de Mongo
+        modelBuilder.Entity<GeneroFavorito>().HasData(
+            new GeneroFavorito { Id = 1, MiembroId = 1, Nombre = "Drama" },
+            new GeneroFavorito { Id = 2, MiembroId = 1, Nombre = "Documental" },
+            new GeneroFavorito { Id = 3, MiembroId = 2, Nombre = "Comedia" },
+            new GeneroFavorito { Id = 4, MiembroId = 3, Nombre = "Ciencia ficción" },
+            new GeneroFavorito { Id = 5, MiembroId = 3, Nombre = "Terror" },
+            new GeneroFavorito { Id = 6, MiembroId = 4, Nombre = "Acción" },
+            new GeneroFavorito { Id = 7, MiembroId = 4, Nombre = "Drama" }
         );
 
         modelBuilder.Entity<Serie>().HasData(

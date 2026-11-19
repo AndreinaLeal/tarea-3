@@ -7,6 +7,7 @@ public class MaratonDbContext(DbContextOptions<MaratonDbContext> opciones) : DbC
 {
     public DbSet<Miembro> Miembros => Set<Miembro>();
     public DbSet<Serie> Series => Set<Serie>();
+    public DbSet<GeneroFavorito> GenerosFavoritos => Set<GeneroFavorito>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +34,19 @@ public class MaratonDbContext(DbContextOptions<MaratonDbContext> opciones) : DbC
              .WithMany(x => x.Series)
              .HasForeignKey(x => x.MiembroId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<GeneroFavorito>(g =>
+        {
+            g.Property(x => x.Nombre).HasMaxLength(40).IsRequired();
+
+            // Un miembro no puede repetir el mismo género favorito
+            g.HasIndex(x => new { x.MiembroId, x.Nombre }).IsUnique();
+
+            g.HasOne(x => x.Miembro)
+             .WithMany(x => x.GenerosFavoritos)
+             .HasForeignKey(x => x.MiembroId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         DatosIniciales.Sembrar(modelBuilder);

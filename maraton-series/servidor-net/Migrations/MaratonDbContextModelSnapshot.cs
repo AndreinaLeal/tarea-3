@@ -22,6 +22,74 @@ namespace ServidorNet.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ServidorNet.Modelos.GeneroFavorito", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MiembroId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MiembroId", "Nombre")
+                        .IsUnique();
+
+                    b.ToTable("GenerosFavoritos");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            MiembroId = 1,
+                            Nombre = "Drama"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            MiembroId = 1,
+                            Nombre = "Documental"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            MiembroId = 2,
+                            Nombre = "Comedia"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            MiembroId = 3,
+                            Nombre = "Ciencia ficción"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            MiembroId = 3,
+                            Nombre = "Terror"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            MiembroId = 4,
+                            Nombre = "Acción"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            MiembroId = 4,
+                            Nombre = "Drama"
+                        });
+                });
+
             modelBuilder.Entity("ServidorNet.Modelos.Miembro", b =>
                 {
                     b.Property<int>("Id")
@@ -56,28 +124,28 @@ namespace ServidorNet.Migrations
                             Id = 1,
                             Correo = "ana@correo.com",
                             Nombre = "Ana",
-                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Registro = new DateTime(2026, 11, 11, 1, 30, 48, 692, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 2,
                             Correo = "luis@correo.com",
                             Nombre = "Luis",
-                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Registro = new DateTime(2026, 11, 11, 1, 30, 48, 692, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 3,
                             Correo = "maria@correo.com",
                             Nombre = "María",
-                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Registro = new DateTime(2026, 11, 11, 1, 30, 48, 692, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 4,
                             Correo = "carlos@correo.com",
                             Nombre = "Carlos",
-                            Registro = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Registro = new DateTime(2026, 11, 11, 1, 30, 48, 692, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -196,6 +264,17 @@ namespace ServidorNet.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ServidorNet.Modelos.GeneroFavorito", b =>
+                {
+                    b.HasOne("ServidorNet.Modelos.Miembro", "Miembro")
+                        .WithMany("GenerosFavoritos")
+                        .HasForeignKey("MiembroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Miembro");
+                });
+
             modelBuilder.Entity("ServidorNet.Modelos.Serie", b =>
                 {
                     b.HasOne("ServidorNet.Modelos.Miembro", "Miembro")
@@ -209,6 +288,8 @@ namespace ServidorNet.Migrations
 
             modelBuilder.Entity("ServidorNet.Modelos.Miembro", b =>
                 {
+                    b.Navigation("GenerosFavoritos");
+
                     b.Navigation("Series");
                 });
 #pragma warning restore 612, 618

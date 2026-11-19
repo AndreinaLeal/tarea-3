@@ -1,182 +1,96 @@
-# Innovation Hub
+# Tarea 3 — Laboratorios del Maratón de series (Parte A)
 
-Proyecto del curso SOFT-12 — Programación web avanzada.
+Repositorio personal con los laboratorios guiados de React y el Maratón de series en su estado final:
+cliente React (con React Router), servidor Express + MongoDB y servidor ASP.NET Core + EF Core + SQL Server.
 
-**Estudiantes:** Andreina Leal y Tatiana Solis
-**Sección:** SCV2 · **Periodo:** III cuatrimestre 2026
-**Docente:** Álvaro Cordero Peña
+La evidencia de cada laboratorio está en [`docs/laboratorios.md`](docs/laboratorios.md).
 
-Innovation Hub es una aplicación web para la comunidad universitaria: permite publicar ideas, necesidades y retos, identificar las competencias necesarias y formar equipos interdisciplinarios que luego pueden convertirse en proyectos.
-
-## Estado del proyecto
-
-| Avance | Contenido | Carpeta |
-|---|---|---|
-| 1 | Prototipo estático (HTML, Bootstrap, Sass, JSON simulado) | `avance1/` (se conserva) |
-| **2** | **Cliente React + API Express + MongoDB** | `cliente/`, `servidor/` |
-| 3 | Entrega final: mismo cliente sobre un servidor en otro lenguaje y modelo relacional | pendiente |
-
-## Arquitectura
+## Estructura
 
 ```
-React (Vite)  ──HTTP/JSON──▶  API Node.js + Express  ──▶  MongoDB
+tarea-3/
+├── docs/                  laboratorios.md y capturas/
+├── proyectos-base/        conceptos-react (props, children, eventos, useState)
+└── maraton-series/
+    ├── cliente/           React + React Router (Vite)
+    ├── servidor/          Express + MongoDB
+    └── servidor-net/      ASP.NET Core + EF Core + SQL Server
 ```
-
-El cliente nunca toca la base de datos: reglas de negocio, permisos y validación viven en el servidor.
-
-```
-innovation-hub/
-├── README.md
-├── docs/
-│   ├── api-contract.md     contrato de la API (CONGELADO)
-│   └── modelo-datos.md     modelo MongoDB y decisiones embebido/referencia
-├── avance1/                prototipo del avance 1
-├── cliente/                aplicación React (Vite)
-│   └── src/  api/ components/ context/ hooks/ pages/ styles/ utils/
-├── servidor/               API Express
-│   └── src/  routes/ controllers/ services/ repositories/ models/ middleware/ utils/
-└── pruebas/                colección de Postman
-```
-
-Capas del servidor: **routes** (enrutamiento y middleware) → **controllers** (HTTP) → **services** (reglas de negocio y validación) → **repositories** (acceso a datos con Mongoose) → **models**.
 
 ## Requisitos
 
-- Node.js 18 o superior (recomendado 20+)
-- MongoDB 6 o superior, local o en Atlas
+- Node.js 20.6 o superior (el servidor usa `node --env-file`)
+- Una base MongoDB (Atlas o local)
+- .NET SDK 10.0.404 (lo fija `servidor-net/global.json`)
+- SQL Server (LocalDB, Express o contenedor)
+- Herramienta de EF Core: `dotnet tool install --global dotnet-ef`
 
-## Instalación y ejecución
+## Cómo ejecutar el Maratón
 
-### 1. Instalar dependencias
+Los tres procesos van en terminales distintas.
 
-```bash
-cd servidor && npm install
-cd ../cliente && npm install
-```
-
-### 2. Variables de entorno
-
-Los archivos `.env` **no se suben al repositorio**. Copia las plantillas:
+### 1. Servidor Express (puerto 3000)
 
 ```bash
-cp servidor/.env.example servidor/.env
-cp cliente/.env.example cliente/.env
-```
-
-| Archivo | Variable | Para qué sirve | Valor de ejemplo |
-|---|---|---|---|
-| servidor/.env | `PORT` | Puerto de la API | `4000` |
-| servidor/.env | `MONGODB_URI` | Conexión a MongoDB | `mongodb://127.0.0.1:27017/innovation_hub` |
-| servidor/.env | `CORS_ORIGIN` | Origen(es) del cliente permitidos | `http://localhost:5173` |
-| servidor/.env | `SESSION_HOURS` | Duración de la sesión | `12` |
-| servidor/.env | `BCRYPT_ROUNDS` | Costo del hash de contraseñas | `10` |
-| cliente/.env | `VITE_API_URL` | Dirección de la API | `http://localhost:4000/api` |
-| cliente/.env | `VITE_GITHUB_API_URL` | API pública de GitHub | `https://api.github.com` |
-
-### 3. Levantar la base de datos
-
-Con MongoDB instalado como servicio, basta con que esté corriendo (`mongod`). Con Docker:
-
-```bash
-docker run -d --name innovation-mongo -p 27017:27017 mongo:7
-```
-
-Con Atlas, pon la cadena de conexión en `MONGODB_URI` (solo en tu `.env`).
-
-### 4. Cargar datos de prueba
-
-```bash
-cd servidor
-npm run seed
-```
-
-Borra y recrea las colecciones con los datos del Avance 1 más usuarios, solicitudes y un proyecto de ejemplo. **Todos los usuarios de prueba usan la contraseña `Password123`**:
-
-| Usuario | Para qué sirve |
-|---|---|
-| `tatiana.solis@example.com` | Tiene solicitudes enviadas (pendiente y rechazada) |
-| `andreina.leal@example.com` | Tiene una solicitud pendiente |
-| `diego.fernandez@example.com` | Propietario de una iniciativa con solicitud recibida |
-| `ana.rojas@example.com` | Propietaria de una iniciativa con equipo y un proyecto |
-
-### 5. Ejecutar el servidor
-
-```bash
-cd servidor
-npm run dev        # o: npm start
-```
-
-Verifica en `http://localhost:4000/api/health`.
-
-### 6. Ejecutar el cliente
-
-```bash
-cd cliente
+cd maraton-series/servidor
+cp .env.example .env        # editar MONGODB_URI con su cadena real
+npm install
+node --env-file=.env src/seed.js   # solo la primera vez: carga miembros y series
 npm run dev
 ```
 
-Abre `http://localhost:5173`.
+Variables (`.env.example`): `PORT`, `MONGODB_URI`, `DB_NAME`, `CLIENT_ORIGIN`.
 
-## Pruebas de la API
+### 2. Cliente React (puerto 5173)
 
-Importa `pruebas/innovation-hub.postman_collection.json` en Postman (o Thunder Client) y ejecútala **en orden** con el Collection Runner, después de `npm run seed`. Cada recurso incluye una petición correcta, una con datos inválidos, una sobre un recurso inexistente y una sin autorización, con verificación automática del código de estado y del formato de error.
+```bash
+cd maraton-series/cliente
+cp .env.example .env        # VITE_API_URL=http://localhost:3000/api
+npm install
+npm run dev
+```
 
-## Documentación
+Abrir http://localhost:5173. Páginas: `/`, `/series` (filtros en la dirección, por ejemplo `?estado=Vista`),
+`/series/nueva` y `/series/:id`.
 
-- Contrato de la API: [`docs/api-contract.md`](docs/api-contract.md) — congelado desde esta entrega.
-- Modelo de datos y justificación embebido/referencia: [`docs/modelo-datos.md`](docs/modelo-datos.md).
+### 3. Servidor .NET (puerto 5256)
 
-## Funcionalidad implementada en el avance 2
+La cadena de conexión **no** está en el repositorio: se guarda con user-secrets.
+La clave se llama `ConnectionStrings:Maraton`.
 
-- Registro, inicio y cierre de sesión (hash con bcrypt; el cierre invalida el token en el servidor).
-- Perfil editable (el correo no se modifica) y búsqueda de personas por nombre, competencia, carrera y disponibilidad.
-- Competencias como relación N:M entre usuarios e iniciativas.
-- Iniciativas: crear, editar, listar, detalle, archivar/eliminar (RN-10), cuatro niveles de visibilidad (RN-03) y modificación solo del propietario (RN-04). Búsqueda, filtros combinados, orden y paginación en el servidor.
-- Solicitudes: crear, modificar mientras están pendientes, cancelar, consultar las propias; el propietario las lista, filtra, acepta y rechaza. Al aceptar, el solicitante entra al equipo.
-- Equipos: lista de miembros y retiro por el propietario (no puede retirarse a sí mismo).
-- Proyectos: conversión con la regla RN-09 verificada en el servidor, listado y detalle.
-- Detalle de proyecto con datos de la API pública de GitHub, con manejo de repositorio inexistente, privado, respuesta inválida, límite de solicitudes y servicio caído.
+```bash
+cd maraton-series/servidor-net
+dotnet user-secrets set "ConnectionStrings:Maraton" "<su cadena de conexion a SQL Server>"
+dotnet ef database update      # crea las tablas y los datos de siembra
+dotnet run --launch-profile http
+```
 
-### Correcciones pedidas por el docente en el avance 1
+Para reconstruir la base desde cero:
 
-- Los formularios ya no marcan todo en rojo: solo se marca el campo inválido, y únicamente después de salir de él o de intentar enviar.
-- Los campos con límite muestran un contador de caracteres (por ejemplo `37/160`).
-- Se eliminó `alert()`: los mensajes se muestran con avisos en pantalla.
+```bash
+dotnet ef database drop --force
+dotnet ef database update
+```
 
-## Decisiones de diseño
+Rutas disponibles (mismo JSON que Express): `GET /api/series` y `GET /api/miembros`.
+Se pueden probar con `servidor-net/requests.http`.
 
-- **Contrato primero:** ids opacos en texto, competencias como listas de nombres, formato de error único y datos derivados (`memberCount`, `isOwner`) para que la API se pueda reimplementar sobre tablas sin cambiar el cliente.
-- **Seguridad:** contraseñas con bcrypt y nunca devueltas; sesiones con token opaco guardado como hash en MongoDB; CORS limitado al origen del cliente; validación repetida en el servidor; errores genéricos sin trazas; verificación de propiedad y visibilidad en cada petición.
-- **Interfaz:** componentes por dominio, estado inmutable, formularios controlados, `useFetch` con `AbortController` y estados explícitos de carga, error y vacío en cada pantalla.
+### Ejecución del proyecto base
 
-## Resumen de commits del Avance 1
+```bash
+cd proyectos-base/conceptos-react
+npm install
+npm run dev
+```
 
-Tabla verificada contra el historial real hasta la etiqueta `entrega-1` (25 commits en 8 días distintos: 6, 7, 8, 9, 10, 16, 26 y 27 de setiembre de 2026).
+## Migraciones de servidor-net
 
-| N.º | Fecha | Commit | Mensaje | Sección del sistema | Cambio principal |
-|---:|---|---|---|---|---|
-| 1 | 2026-09-06 | `d21a70a` | Initial commit | Repositorio | Crea el repositorio con un README inicial. |
-| 2 | 2026-09-06 | `3900e20` | Delete README.md | Documentación | Elimina el README inicial para rehacerlo. |
-| 3 | 2026-09-06 | `e002bac` | Initialize README with project information | Documentación | Agrega al README los datos del proyecto. |
-| 4 | 2026-09-06 | `086c9d0` | Crear estructura del avance 1 y documentacion inicial | Estructura del proyecto | Crea .gitignore, carpetas de avance1, JSON de datos, index.html, app.js y las primeras variables de Sass. |
-| 5 | 2026-09-06 | `452e4db` | Merge branch 'main' of innovation-hub | Repositorio | Une la rama main remota con el trabajo local. |
-| 6 | 2026-09-06 | `49bc187` | Agregar tabla de resumen de commits al README | Documentación | Agrega al README la tabla de resumen de commits. |
-| 7 | 2026-09-07 | `adf0472` | Maquetar el encabezado y la navegacion del catalogo | Catálogo | Maqueta el encabezado y la navegación de catalogo.html. |
-| 8 | 2026-09-07 | `02a0108` | Agregar el main con h1 y el panel de filtros del catalogo | Catálogo | Agrega el contenido principal con h1 y el panel de filtros. |
-| 9 | 2026-09-07 | `160e80f` | Agregar las tarjetas de resultados del catalogo | Catálogo | Agrega las tarjetas de resultados. |
-| 10 | 2026-09-07 | `6c74fe6` | Completar la estructura semantica del catalogo | Catálogo | Completa la estructura semántica de la página. |
-| 11 | 2026-09-08 | `25a4561` | Agrega pagina de detalle de iniciativa | Detalle de iniciativa | Crea la página de detalle con sus estilos. |
-| 12 | 2026-09-09 | `76a6366` | Agrega formulario de solicitud de participacion | Solicitud de participación | Crea el formulario de solicitud y sus estilos. |
-| 13 | 2026-09-10 | `0510b6f` | Renombra paginas para coincidir con los enlaces del catalogo | Estructura y Sass | Renombra detalle.html y solicitudes.html, y agrega styles.scss y package.json. |
-| 14 | 2026-09-10 | `50f2b28` | Convierte el catalogo a Bootstrap | Catálogo | Migra el catálogo a la grilla y los componentes de Bootstrap. |
-| 15 | 2026-09-10 | `ea99b7c` | Convierte el detalle de iniciativa a Bootstrap | Detalle de iniciativa | Migra el detalle a Bootstrap. |
-| 16 | 2026-09-10 | `2525473` | Crea el formulario de publicar iniciativa en Bootstrap | Registro de iniciativa | Crea publicar.html con el formulario en Bootstrap. |
-| 17 | 2026-09-10 | `52f0641` | Agrega carga de datos y renderizado dinamico del catalogo | Catálogo | Carga las iniciativas desde JSON y genera las tarjetas con JavaScript. |
-| 18 | 2026-09-16 | `9bbc052` | Actualiza datos con visibilidad y descripcion, y enlaza detalle por id | Datos y catálogo | Agrega visibilidad y descripción a los datos y enlaza cada tarjeta al detalle por id. |
-| 19 | 2026-09-16 | `382e2b7` | Agrega renderizado dinamico del detalle con visibilidad y eliminacion | Detalle de iniciativa | Genera el detalle desde los datos, aplica la visibilidad y agrega la eliminación. |
-| 20 | 2026-09-16 | `61902eb` | Agrega competencias dinamicas y validacion en publicar iniciativa | Registro de iniciativa | Agrega competencias dinámicas y validación con JavaScript. |
-| 21 | 2026-09-16 | `85e128a` | Agrega validacion al formulario de solicitud | Solicitud de participación | Valida el formulario de solicitud con mensajes por campo. |
-| 22 | 2026-09-16 | `ebe51c1` | Add Tatiana Solis to student list | Documentación | Agrega a Tatiana Solís a la lista de integrantes del README. |
-| 23 | 2026-09-26 | `c6258e8` | agrega perfil proyectos y completa navegacion del prototipo | Perfil, proyectos e inicio | Agrega las páginas de perfil y proyectos, el CSS de inicio, las categorías en JSON y completa la navegación. |
-| 24 | 2026-09-26 | `ff2f78d` | actualiza documentacion del avance 1 | Documentación | Actualiza el README del avance 1. |
-| 25 | 2026-09-27 | `64cc60f` | Corrige categorias, agrega persistencia real a publicar/editar y segundo parcial de Sass | Iniciativas y Sass | Corrige categorías, guarda y edita iniciativas en localStorage y agrega el parcial _componentes.scss. |
+| Migración | Qué agrega |
+|---|---|
+| `Inicial` | Tablas `Miembros` y `Series`, índice único de correo, CHECK y clave foránea |
+| `DatosDeSiembra` | Datos de siembra de miembros y series (`HasData`) |
+| `GenerosFavoritosDeMiembro` | Tabla `GenerosFavoritos` para el arreglo `generosFavoritos` de Mongo |
+
+## Qué no se versiona
+
+`node_modules/`, `bin/`, `obj/`, `.env` y cualquier secreto. Los `.env.example` sí se incluyen.

@@ -1,9 +1,9 @@
 // PaginaSeries.jsx
-// La página "/series": lo que antes era App. Pide las series y los miembros al API
-// y reparte por props a la lista, los filtros y el resumen.
+// La pagina "/series": pide las series y los miembros al API y reparte por props
+// a la lista, los filtros y el resumen. Los filtros viven en la direccion (?estado=...&miembro=...).
 
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { ESTADOS } from '../data/series.js'
 import { siguienteEstado } from '../utils/series.js'
 import {
@@ -18,15 +18,28 @@ import Filtros from '../componentes/filtros/Filtros.jsx'
 import Resumen from '../componentes/resumen/Resumen.jsx'
 
 function PaginaSeries() {
-  // ── Estado ──
+  // -- Estado --
   const [series, setSeries] = useState([])
   const [miembros, setMiembros] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
-  const [filtroEstado, setFiltroEstado] = useState('Todos')
-  const [filtroMiembro, setFiltroMiembro] = useState('Todos')
 
-  // ── Al mostrarse la página: pedir los datos al API ──
+  // -- Filtros: salen de la direccion, no de un useState --
+  const [parametros, setParametros] = useSearchParams()
+  const filtroEstado = parametros.get('estado') ?? 'Todos'
+  const filtroMiembro = parametros.get('miembro') ?? 'Todos'
+
+  function cambiarFiltro(nombre, valor) {
+    const nuevos = new URLSearchParams(parametros)
+    if (valor === 'Todos') {
+      nuevos.delete(nombre) // "Todos" es lo normal: no ensucia la direccion
+    } else {
+      nuevos.set(nombre, valor)
+    }
+    setParametros(nuevos)
+  }
+
+  // -- Al mostrarse la pagina: pedir los datos al API --
   useEffect(() => {
     async function cargar() {
       try {
@@ -46,7 +59,7 @@ function PaginaSeries() {
   }, [])
   // [] = solo una vez, al montar
 
-  // ── Estado derivado: se calcula cada vez que la página se dibuja ──
+  // -- Estado derivado: se calcula cada vez que la pagina se dibuja --
   const visibles = series.filter(
     (serie) =>
       (filtroEstado === 'Todos' || serie.estado === filtroEstado) &&
@@ -58,7 +71,7 @@ function PaginaSeries() {
     cantidad: series.filter((serie) => serie.estado === estado).length,
   }))
 
-  // ── Cambios: primero el API, después el estado ──
+  // -- Cambios: primero el API, despues el estado --
   async function avanzar(id) {
     const actual = series.find((serie) => serie._id === id)
     try {
@@ -109,8 +122,8 @@ function PaginaSeries() {
               miembros={miembros}
               estado={filtroEstado}
               miembro={filtroMiembro}
-              onCambiarEstado={setFiltroEstado}
-              onCambiarMiembro={setFiltroMiembro}
+              onCambiarEstado={(valor) => cambiarFiltro('estado', valor)}
+              onCambiarMiembro={(valor) => cambiarFiltro('miembro', valor)}
             />
           </Panel>
           <Panel titulo={`Series del club (${visibles.length})`}>

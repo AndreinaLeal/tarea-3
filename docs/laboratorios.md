@@ -13,7 +13,7 @@ Cada sección tiene: captura del resultado esperado, tabla «Explique el recorri
 
 ### 1.1 Conceptos de React
 
-<!-- TODO captura: capturas/01-conceptos-react.png -->
+![Proyecto base de conceptos de React](capturas/01-conceptos-react.png)
 
 **Explique el recorrido**
 
@@ -33,7 +33,7 @@ Cada sección tiene: captura del resultado esperado, tabla «Explique el recorri
 
 ### 1.2 Props, children, eventos y useState
 
-<!-- TODO captura: capturas/02-props-children-eventos-usestate.png -->
+![Proyecto base de props, children, eventos y useState](capturas/02-props-children-eventos-usestate.png)
 
 **Explique el recorrido**
 
@@ -57,7 +57,9 @@ Cada sección tiene: captura del resultado esperado, tabla «Explique el recorri
 
 ### 2.1 Montaje del proyecto
 
-<!-- TODO captura: capturas/03-montaje.png -->
+![Página de inicio del Maratón (/)](capturas/03-montaje.png)
+
+> Captura del estado final, que acumula el trabajo de este laboratorio.
 
 **Explique el recorrido**
 
@@ -75,7 +77,9 @@ Cada sección tiene: captura del resultado esperado, tabla «Explique el recorri
 
 ### 2.2 Armar el tablero (componentes)
 
-<!-- TODO captura: capturas/04-tablero.png -->
+![Tablero de series armado con componentes](capturas/04-tablero.png)
+
+> Captura del estado final, que acumula el trabajo de este laboratorio.
 
 Componentes: `Layout`, `Encabezado`, `Panel`, `ListaSeries`, `TarjetaSerie`, `Filtros`, `Resumen`, `FormularioSerie`.
 
@@ -93,7 +97,9 @@ Componentes: `Layout`, `Encabezado`, `Panel`, `ListaSeries`, `TarjetaSerie`, `Fi
 
 ### 2.3 useState
 
-<!-- TODO captura: capturas/05-usestate.png -->
+![El estado cambia el resumen y la lista al elegir un filtro](capturas/07b-filtro-viendo.png)
+
+> Captura del estado final, que acumula el trabajo de este laboratorio.
 
 **Explique el recorrido**
 
@@ -233,7 +239,9 @@ Componentes: `Layout`, `Encabezado`, `Panel`, `ListaSeries`, `TarjetaSerie`, `Fi
 
 ![Lista después de quitar «Serie de prueba»](capturas/12-estado-y-quitar.png)
 
-<!-- TODO captura pendiente: una serie antes y después de pulsar «Pasar a Vista» -->
+![Antes de pulsar «Pasar a Vista»](capturas/12a-antes-estado.png)
+
+![Después de pulsar «Pasar a Vista»](capturas/12b-despues-estado.png)
 
 **Explique el recorrido**
 
@@ -262,7 +270,9 @@ Componentes: `Layout`, `Encabezado`, `Panel`, `ListaSeries`, `TarjetaSerie`, `Fi
 
 ![Filtro en la dirección: /series?estado=Viendo](capturas/13b-filtros-en-direccion.png)
 
-<!-- TODO capturas pendientes: página de detalle /series/:id y formulario en /series/nueva -->
+![Página de detalle /series/:id](capturas/13c-detalle-serie.png)
+
+![Formulario en /series/nueva](capturas/13d-series-nueva.png)
 
 **Explique el recorrido**
 
@@ -297,7 +307,7 @@ Componentes: `Layout`, `Encabezado`, `Panel`, `ListaSeries`, `TarjetaSerie`, `Fi
 
 ![GET /api/series desde .NET](capturas/14b-get-series-net.png)
 
-<!-- TODO captura pendiente: GET /api/miembros desde .NET (http://localhost:5256/api/miembros) -->
+![GET /api/miembros desde .NET](capturas/14c-get-miembros-net.png)
 
 **Explique el recorrido** (petición `GET /api/series` → SQL → JSON)
 

@@ -5,8 +5,9 @@ const URL_API = import.meta.env.VITE_API_URL
 
 // Hace la petición y devuelve los datos de la respuesta.
 // Si el servidor responde con un error, lanza un Error con su mensaje.
-async function pedir(ruta, metodo = 'GET', datos) {
-  const opciones = { method: metodo }
+// senal (opcional) permite cancelar la petición con un AbortController.
+async function pedir(ruta, metodo = 'GET', datos, senal) {
+  const opciones = { method: metodo, signal: senal }
   if (datos !== undefined) {
     opciones.headers = { 'Content-Type': 'application/json' }
     opciones.body = JSON.stringify(datos)
@@ -15,7 +16,10 @@ async function pedir(ruta, metodo = 'GET', datos) {
   let respuesta
   try {
     respuesta = await fetch(URL_API + ruta, opciones)
-  } catch {
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw err // la cancelamos nosotros: se deja pasar
+    }
     throw new Error('No se pudo conectar con el API. ¿Está encendido el servidor?')
   }
 
@@ -27,6 +31,7 @@ async function pedir(ruta, metodo = 'GET', datos) {
   if (!respuesta.ok) {
     const error = new Error(cuerpo.error.mensaje)
     error.detalles = cuerpo.error.detalles // 400: un mensaje por campo
+    error.estado = respuesta.status // 404, 400, 500…
     throw error
   }
   return cuerpo
@@ -51,11 +56,6 @@ export function cambiarEstadoSerie(id, estado) {
 export function eliminarSerie(id) {
   return pedir(`/series/${id}`, 'DELETE')
 }
-export async function obtenerSerie(id) {
-  const series = await obtenerSeries()
-  const serie = series.find((s) => s._id === id)
-  if (!serie) {
-    throw new Error('No se encontró la serie')
-  }
-  return serie
+export function obtenerSerie(id, senal) {
+  return pedir(`/series/${id}`, 'GET', undefined, senal)
 }

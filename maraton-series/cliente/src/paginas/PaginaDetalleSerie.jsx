@@ -11,19 +11,27 @@ function PaginaDetalleSerie() {
   const { id } = useParams()
   const [serie, setSerie] = useState(null)
   const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(null) // { mensaje, estado } o null
 
+  // Se ejecuta al montar y cada vez que cambia el id
   useEffect(() => {
+    const controlador = new AbortController()
+
     async function cargar() {
+      setCargando(true)
+      setError(null)
       try {
-        setSerie(await obtenerSerie(id))
+        setSerie(await obtenerSerie(id, controlador.signal))
       } catch (err) {
-        setError(err.message)
-      } finally {
-        setCargando(false)
+        if (err.name === 'AbortError') return // la cancelamos nosotros: no es un error
+        setError({ mensaje: err.message, estado: err.estado })
       }
+      setCargando(false)
     }
     cargar()
+
+    // Limpieza: si el id cambia o se sale de la página, se cancela la petición pendiente
+    return () => controlador.abort()
   }, [id])
 
   if (cargando) {
@@ -38,7 +46,12 @@ function PaginaDetalleSerie() {
   if (error) {
     return (
       <>
-        <div className="alert alert-danger">{error}</div>
+        <div className="alert alert-danger">
+          <h1 className="h5">
+            {error.estado === 404 ? 'Serie no encontrada' : 'No se pudo cargar la serie'}
+          </h1>
+          <p className="mb-0">{error.mensaje}</p>
+        </div>
         <Link className="btn btn-outline-primary" to="/series">
           ← Volver a las series
         </Link>

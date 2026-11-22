@@ -197,20 +197,39 @@ Porque es una ruta de diseño: su trabajo no es corresponder a una dirección, s
 Porque el efecto pide al API la serie que corresponde al `id` de la dirección. Con `[id]`, el efecto se vuelve a ejecutar cada vez que el `id` cambia, así que siempre se muestra la serie correcta. Con `[]` correría solo una vez, al montar el componente: si el `id` cambiara sin que el componente se desmonte (por ejemplo, de `/series/A` a `/series/B`), React Router reutilizaría el mismo componente y no se volvería a pedir nada, y la pantalla se quedaría con la serie anterior.
 
 **5. ¿Qué hace la limpieza del efecto y qué mostraron los experimentos 10.3 y 10.4?**
-La limpieza es `return () => controlador.abort()`. React la llama antes de volver a ejecutar el efecto (porque cambió el `id`) o cuando se sale de la página, y cancela la petición pendiente para que una respuesta vieja no pise el estado con datos que ya no corresponden. En desarrollo, `StrictMode` monta, limpia y vuelve a montar el efecto, por eso se ve una petición cancelada y otra completa. Experimento 10.3 (sin limpieza): al abrir un detalle hubo 2 peticiones completas (200) y 0 canceladas, en lugar de 1 completa y 1 cancelada; si el `id` cambiara rápido, la respuesta vieja podría llegar después y mostrar la serie equivocada. Experimento 10.4 (cancelación tratada como falla): al borrar el `if (err.name === 'AbortError')` de `pedir`, la petición cancelada por la limpieza se convirtió en un error de conexión y apareció «No se pudo conectar con el API. ¿Está encendido el servidor?» aunque la segunda petición sí funcionó. Por eso `pedir` deja pasar el `AbortError` y `PaginaDetalleSerie` lo ignora: cancelar es algo que hicimos nosotros, no una falla.
+La limpieza es `return () => controlador.abort()`. React la llama antes de volver a ejecutar el efecto (porque cambió el `id`) o cuando se sale de la página, y cancela la petición pendiente para que una respuesta vieja no pise el estado con datos que ya no corresponden. En desarrollo, `StrictMode` monta, limpia y vuelve a montar el efecto, por eso se ve una petición cancelada y otra completa. Experimento 10.3 (sin limpieza): al abrir un detalle hubo 2 peticiones completas (respondieron 304 desde la caché) y 0 canceladas, en lugar de 1 completa y 1 cancelada; si el `id` cambiara rápido, la respuesta vieja podría llegar después y mostrar la serie equivocada. Experimento 10.4 (cancelación tratada como falla): al borrar el `if (err.name === 'AbortError')` de `pedir`, la petición cancelada por la limpieza se convirtió en un error de conexión y apareció «No se pudo conectar con el API. ¿Está encendido el servidor?» aunque la segunda petición sí funcionó. Por eso `pedir` deja pasar el `AbortError` y `PaginaDetalleSerie` lo ignora: cancelar es algo que hicimos nosotros, no una falla.
 
 **6. ¿Qué se gana al guardar los filtros en la dirección? ¿Cómo se usaría lo mismo para paginar?**
 Al guardar los filtros en la dirección (`/series?estado=Viendo&miembro=Ana`) en lugar de en `useState`, los filtros sobreviven a una recarga, el botón Atrás vuelve al filtro anterior y el enlace se puede compartir y abre la lista ya filtrada. Además, los filtros dejan de ser estado de React y se derivan de la dirección en cada dibujo. Para paginar se usa la misma técnica con `useSearchParams`: se guardan `?page=2&size=10` en la dirección, se leen con `parametros.get('page') ?? '1'` y se cambian con `setParametros`, copiando con `new URLSearchParams(parametros)` y usando `set`. Así cada página tiene su propia dirección: se puede recargar, volver con Atrás y compartir un enlace directo a la página 2.
 
 ### Experimentos realizados
 
-| Experimento | Qué se hizo | Qué observé |
+Cada experimento rompe una pieza a propósito; el código se restauró después de cada uno.
+
+**10.1 `<a href>` en lugar de `Link`.** En `Inicio.jsx` se cambió el `Link` por `<a href="/series">`. La navegación llega a la página correcta, pero el navegador hace una petición nueva al servidor y recarga toda la aplicación: se ve un parpadeo, React arranca desde cero, se vuelven a pedir los datos al API y se pierde el estado en memoria. `Link` evita todo eso: intercepta el clic, cambia la dirección con la API de historial y React Router redibuja solo la parte que cambia, sin recargar y conservando el estado.
+
+**10.2 `Layout.jsx` sin `<Outlet />`.** El encabezado se sigue mostrando, pero el contenido de todas las páginas desaparece y solo queda el espacio en blanco debajo. La dirección cambia y no hay error en la consola. Las rutas siguen coincidiendo, pero `<Outlet />` es el lugar donde React Router dibuja la ruta hija; sin él, `Layout` no tiene dónde poner la página.
+
+**10.3 Sin la limpieza del efecto.** Se abrió un detalle con la pestaña Red abierta, primero con `return () => controlador.abort()` y después sin esa línea:
+
+| Al abrir un detalle | Con limpieza | Sin limpieza |
 |---|---|---|
-| 10.1 `<a href>` en lugar de `Link` | En `Inicio.jsx`, cambiar el `Link` por `<a href="/series">` y hacer clic con la pestaña Red en «Todo» | ⚠ CONFIRMAR: apareció una petición de tipo documento a `/series` (con `Link` no aparece) |
-| 10.2 Sin `<Outlet />` | En `Layout.jsx`, borrar `<Outlet />` y navegar | ⚠ CONFIRMAR: solo se ve el encabezado |
-| 10.3 Sin limpieza | Borrar `return () => controlador.abort()` y abrir un detalle con la pestaña Red abierta | ⚠ CONFIRMAR: sin la línea, 2 peticiones 200 y 0 canceladas; con la línea, 1 completa y 1 cancelada |
-| 10.4 Cancelación tratada como falla | Borrar el `if (err.name === 'AbortError')` de `pedir` y abrir un detalle | ⚠ CONFIRMAR: apareció «No se pudo conectar con el API. ¿Está encendido el servidor?» |
-| 10.5 La ruta `*` primero | Mover `path="*"` al inicio de las rutas de `Layout` y navegar | ⚠ CONFIRMAR: todo siguió funcionando |
+| Peticiones completas | 1 (`200`) | 2 (respondieron `304`: el navegador reutilizó su caché, pero llegaron completas) |
+| Peticiones canceladas | 1 (`(canceled)`) | 0 |
+
+![Con limpieza: una petición cancelada y una 200](capturas/10-3-con-limpieza.png)
+
+![Sin limpieza: dos peticiones completas y ninguna cancelada](capturas/10-3-sin-limpieza.png)
+
+Sin la limpieza, las dos ejecuciones del efecto (por `StrictMode`) completan su petición y las dos escriben el estado. Aquí piden la misma serie y no se nota, pero si el `id` cambiara rápido, la respuesta vieja podría llegar después y mostrar la serie equivocada.
+
+**10.4 Sin el `if (err.name === 'AbortError')`.** Al abrir un detalle apareció el mensaje «No se pudo cargar la serie: No se pudo conectar con el API. ¿Está encendido el servidor?», aunque el servidor estaba encendido. En la pestaña Red se ven dos peticiones al mismo id: la primera aparece como `(canceled)` (2 ms) y la segunda responde `200` (79 ms).
+
+![Error de conexión con el servidor encendido](capturas/10-4-error-de-conexion.png)
+
+En desarrollo, `<StrictMode>` ejecuta el efecto, corre su limpieza y lo ejecuta otra vez. La limpieza cancela la primera petición con el `AbortController`, y `fetch` lanza un `AbortError`. Sin el `if`, ese error cae en el `catch` y se transforma en el error genérico de conexión, que la página ya no reconoce como una cancelación y muestra como si fuera un fallo real. Aunque la segunda petición sí funciona, el error de la primera queda en pantalla. El `if` deja pasar el `AbortError` sin convertirlo, para que la página pueda ignorarlo.
+
+**10.5 `path="*"` al inicio.** No cambia nada: todas las páginas siguen funcionando y una dirección inexistente (`/zzz`) sigue mostrando `NoEncontrada`. React Router no elige la ruta por el orden en que están escritas, sino por la que mejor coincide, la más específica. `path="*"` es la menos específica, así que solo gana cuando ninguna otra coincide, esté donde esté escrita; el orden en el código es solo por legibilidad.
 
 ---
 
